@@ -3,44 +3,82 @@
 ############################
 bin/
 obj/
+.vs/
 *.user
 *.suo
 *.cache
 *.pdb
 *.mdb
 *.log
-*.vs/
+*.opendb
 *.snupkg
-*.dbmdl
-*.bak
+
+# Databases
+*.mdf
 *.ldf
 *.ndf
+*.dbmdl
+*.bak
 
-# Auto-generated files
+# Test & Coverage
+TestResults/
+*.coverage
+*.coveragexml
+
+# Tools / IDE
+_ReSharper.Caches/
+*.DotSettings.user
+.idea/
+.vscode/
+
+# Code Analysis / Misc
 Generated_Code/
+BenchmarkDotNet.Artifacts/
 
-# NuGet packages
+# Azure Functions (local secrets)
+local.settings.json
+
+############################
+# NuGet
+############################
 *.nupkg
 packages/
 
 ############################
-# Node / React
+# Node / React (frontend)
 ############################
 # dependencies
 node_modules/
 bower_components/
 
-# production
+# production builds
 build/
 dist/
+.next/
+out/
 
-# misc
-.DS_Store
+# testing / coverage
+coverage/
+
+# caches
+.eslintcache
+*.tsbuildinfo
+.parcel-cache/
+
+# logs
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# env files (keep the base .env if you use it intentionally)
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+############################
+# OS files
+############################
+.DS_Store
+Thumbs.db
