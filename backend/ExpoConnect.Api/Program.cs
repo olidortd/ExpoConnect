@@ -8,6 +8,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ExpoConnect.Application.Interfaces;
 using ExpoConnect.Domain;
+using ExpoConnect.Infrastructure.Services;
+
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,11 +20,17 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
             npg => npg.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
 
 
+
+
+
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection(JwtOptions.SectionName));
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddScoped<ICatalogService, CatalogService>();
+
+builder.Services.AddScoped<IUsersService, UsersService>();
+
 
 builder.Services.AddControllers();
 

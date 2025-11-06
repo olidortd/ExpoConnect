@@ -48,6 +48,27 @@ public class AppDbContext : DbContext
              .Metadata.SetValueComparer(stickersComparer);
         });
 
+        b.Entity<User>(e =>
+        {
+            e.ToTable("users");
+            e.HasKey(x => x.UserId);
+            e.Property(x => x.UserId).HasColumnName("user_id");
+            e.Property(x => x.Email).HasColumnName("email").IsRequired();
+            e.HasIndex(x => x.Email).IsUnique();
+            e.Property(x => x.DisplayName).HasColumnName("display_name");
+            e.Property(x => x.Phone).HasColumnName("phone");
+            e.Property(x => x.Company).HasColumnName("company");
+
+            e.Property(x => x.Role).HasColumnName("role").HasConversion<string>().HasColumnType("text");
+
+            e.Property(x => x.IsActive).HasColumnName("is_active");
+            e.Property(x => x.CreatedAt).HasColumnName("created_at");
+            e.Property(x => x.PasswordHash).HasColumnName("password_hash").IsRequired();
+            e.Property(x => x.RefreshTokenHash).HasColumnName("refresh_token_hash");
+            e.Property(x => x.RefreshTokenExpiresAtUtc).HasColumnName("refresh_token_expires_at_utc");
+        });
+
+
         b.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
     }
 }
