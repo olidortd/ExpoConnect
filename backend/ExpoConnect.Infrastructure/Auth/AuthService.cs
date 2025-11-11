@@ -157,7 +157,6 @@ public async Task<AuthResponse> RefreshAsync(string refreshToken, CancellationTo
     private static string GenerateRefreshToken()
     {
         var bytes = RandomNumberGenerator.GetBytes(64);
-        // Base64Url (ללא padding, URL-safe)
         var s = Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
         return s;
     }
@@ -166,7 +165,7 @@ public async Task<AuthResponse> RefreshAsync(string refreshToken, CancellationTo
     {
         using var sha = SHA256.Create();
         var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(refreshToken));
-        return Convert.ToHexString(bytes); // לשמירה ב-DB
+        return Convert.ToHexString(bytes);
     }
 
     private static long ToUnix(DateTime dt) => (long)(dt - DateTime.UnixEpoch).TotalSeconds;

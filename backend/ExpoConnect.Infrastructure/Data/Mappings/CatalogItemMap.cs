@@ -11,16 +11,22 @@ public class CatalogItemMap : IEntityTypeConfiguration<CatalogItem>
         e.ToTable("catalog_item");
 
         e.HasKey(x => x.ItemId).HasName("pk_catalog_item");
+
         e.Property(x => x.ItemId)
             .HasColumnName("item_id")
             .HasColumnType("uuid")
             .HasDefaultValueSql("uuid_generate_v4()");
 
-        e.Property(x => x.StandId)
-            .HasColumnName("stand_id")
-            .HasColumnType("varchar")
-            .HasMaxLength(128)
+        e.Property(x => x.CatalogId)
+            .HasColumnName("catalog_id")
+            .HasColumnType("uuid")
             .IsRequired();
+
+        e.HasOne(x => x.Catalog)
+            .WithMany(c => c.Items)
+            .HasForeignKey(x => x.CatalogId)
+            .HasConstraintName("fk_catalog_item_catalog")
+            .OnDelete(DeleteBehavior.Cascade);
 
         e.Property(x => x.Name)
             .HasColumnName("name")
@@ -31,34 +37,31 @@ public class CatalogItemMap : IEntityTypeConfiguration<CatalogItem>
         e.Property(x => x.Description)
             .HasColumnName("description")
             .HasColumnType("text")
-            .IsRequired();
+            .IsRequired(false);
 
         e.Property(x => x.Category)
             .HasColumnName("category")
             .HasColumnType("varchar")
-            .HasMaxLength(100);
+            .HasMaxLength(100)
+            .IsRequired();
 
         e.Property(x => x.Price)
             .HasColumnName("price")
-            .HasColumnType("text");
+            .HasColumnType("numeric(12,2)")
+            .IsRequired();
 
         e.Property(x => x.ImageUrl)
             .HasColumnName("image_url")
-            .HasColumnType("text");
+            .HasColumnType("text")
+            .IsRequired(false);
 
-        // text[] ← string[]
         e.Property(x => x.Features)
             .HasColumnName("features")
-            .HasColumnType("text[]");
+            .HasColumnType("text[]")
+            .IsRequired(false);
 
-        e.HasIndex(x => new { x.StandId, x.Name }).IsUnique();
-        e.HasIndex(x => x.StandId);
+        e.HasIndex(x => new { x.CatalogId, x.Name }).IsUnique();
+        e.HasIndex(x => x.CatalogId);
         e.HasIndex(x => x.Category);
-
-        e.HasOne(x => x.Stand)
-            .WithMany(s => s.Catalog)
-            .HasForeignKey(x => x.StandId)
-            .HasConstraintName("fk_catalog_item_stand")
-            .OnDelete(DeleteBehavior.Cascade);
     }
 }

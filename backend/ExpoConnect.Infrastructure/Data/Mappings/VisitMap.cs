@@ -35,11 +35,11 @@ public class VisitMap : IEntityTypeConfiguration<Visit>
             .HasColumnName("rating")
             .HasColumnType("int4");
 
-        // enum[] ← VisitSticker[]
-        e.Property(x => x.Stickers)
-            .HasColumnName("stickers")
-            .HasConversion<string>()      // enum <-> string
-            .HasColumnType("text[]");
+        e.Property(v => v.Stickers)
+             .HasColumnName("stickers")
+             .HasColumnType("visit_sticker[]")
+             .IsRequired(false);
+
         e.Property(x => x.IsFavorite)
             .HasColumnName("is_favorite")
             .HasColumnType("bool")

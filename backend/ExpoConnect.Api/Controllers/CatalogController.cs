@@ -1,75 +1,34 @@
-﻿// Api/Controllers/CatalogController.cs
+﻿using ExpoConnect.Application.Interfaces;
+using ExpoConnect.Contracts.Catalogs;
 using ExpoConnect.Contracts.Items;
-using ExpoConnect.Domain.Expo;
-using ExpoConnect.Infrastructure.Items;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExpoConnect.Api.Controllers;
 
 [ApiController]
-[Route("api/catalog")]
+[Route("api/catalogs")]
 [Authorize]
-public class CatalogController : ControllerBase
+public class CatalogController(ICatalogService svc) : ControllerBase
 {
-    private readonly ICatalogService _svc;
-    public CatalogController(ICatalogService svc) => _svc = svc;
+    private readonly ICatalogService _svc = svc;
 
-    [HttpGet("{standId}")]
-    public async Task<ActionResult<List<CatalogItemResponse>>> ListByStand(string standId, CancellationToken ct)
-    {
-        var items = await _svc.ListByStandAsync(standId, ct);
-        return Ok(items.Select(i =>
-            new CatalogItemResponse(i.ItemId, i.StandId, i.Name, i.Description, i.Category, i.Price, i.ImageUrl, i.Features)));
-    }
+    [HttpGet]
+    public async Task<ActionResult<List<CatalogResponse>>> List(CancellationToken ct)
+        => Ok(await _svc.ListAsync(ct));
 
-    [HttpGet("item/{itemId:guid}")]
-    public async Task<ActionResult<CatalogItemResponse>> Get(Guid itemId, CancellationToken ct)
+    [HttpGet("{catalogId:guid}")]
+    public async Task<ActionResult<CatalogResponse>> Get(Guid catalogId, CancellationToken ct)
     {
-        var i = await _svc.GetAsync(itemId, ct);
-        if (i is null) return NotFound();
-        return Ok(new CatalogItemResponse(i.ItemId, i.StandId, i.Name, i.Description, i.Category, i.Price, i.ImageUrl, i.Features));
+        var result = await _svc.GetAsync(catalogId, ct);
+        return result is null ? NotFound() : Ok(result);
     }
 
     [HttpPost]
-    public async Task<ActionResult<CatalogItemResponse>> Create(CatalogItemCreateRequest req, CancellationToken ct)
-    {
-        var entity = new CatalogItem
-        {
-            StandId = req.StandId,
-            Name = req.Name,
-            Description = req.Description,
-            Category = req.Category,
-            Price = req.Price,
-            ImageUrl = req.ImageUrl,
-            Features = req.Features
-        };
-        var i = await _svc.CreateAsync(entity, ct);
-        return CreatedAtAction(nameof(Get), new { itemId = i.ItemId },
-            new CatalogItemResponse(i.ItemId, i.StandId, i.Name, i.Description, i.Category, i.Price, i.ImageUrl, i.Features));
-    }
+    public async Task<ActionResult<CatalogResponse>> Create([FromBody] CreateCatalogRequest req, CancellationToken ct)
+        => Ok(await _svc.CreateAsync(req, ct));
 
-    [HttpPut("{itemId:guid}")]
-    public async Task<ActionResult<CatalogItemResponse>> Update(Guid itemId, CatalogItemUpdateRequest req, CancellationToken ct)
-    {
-        var i = await _svc.UpdateAsync(itemId, x =>
-        {
-            x.Name = req.Name;
-            x.Description = req.Description;
-            x.Category = req.Category;
-            x.Price = req.Price;
-            x.ImageUrl = req.ImageUrl;
-            x.Features = req.Features;
-        }, ct);
-
-        if (i is null) return NotFound();
-        return Ok(new CatalogItemResponse(i.ItemId, i.StandId, i.Name, i.Description, i.Category, i.Price, i.ImageUrl, i.Features));
-    }
-
-    [HttpDelete("{itemId:guid}")]
-    public async Task<IActionResult> Delete(Guid itemId, CancellationToken ct)
-    {
-        var ok = await _svc.DeleteAsync(itemId, ct);
-        return ok ? NoContent() : NotFound();
-    }
+    [HttpPost("items")]
+    public async Task<ActionResult<CatalogItemResponse>> AddItem([FromBody] CreateCatalogItemRequest req, CancellationToken ct)
+        => Ok(await _svc.AddItemAsync(req, ct));
 }

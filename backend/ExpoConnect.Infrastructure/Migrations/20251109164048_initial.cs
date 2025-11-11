@@ -6,11 +6,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ExpoConnect.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:Enum:visit_sticker", "innovative,professional,friendly,informative,high_quality,good_value,impressive,would_recommend");
+
             migrationBuilder.CreateTable(
                 name: "users",
                 columns: table => new
@@ -48,7 +51,7 @@ namespace ExpoConnect.Infrastructure.Migrations
                 {
                     table.PrimaryKey("pk_auth_refresh_token", x => x.id);
                     table.ForeignKey(
-                        name: "FK_auth_refresh_token_users_user_id",
+                        name: "fk_auth_refresh_token_users_user_id",
                         column: x => x.user_id,
                         principalTable: "users",
                         principalColumn: "user_id",
@@ -94,7 +97,7 @@ namespace ExpoConnect.Infrastructure.Migrations
                 {
                     table.PrimaryKey("pk_user_credentials", x => x.user_id);
                     table.ForeignKey(
-                        name: "FK_user_credentials_users_user_id",
+                        name: "fk_user_credentials_users_user_id",
                         column: x => x.user_id,
                         principalTable: "users",
                         principalColumn: "user_id",
@@ -102,23 +105,20 @@ namespace ExpoConnect.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "catalog_item",
+                name: "catalogs",
                 columns: table => new
                 {
-                    item_id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
-                    stand_id = table.Column<string>(type: "varchar", maxLength: 128, nullable: false),
-                    name = table.Column<string>(type: "varchar", maxLength: 200, nullable: false),
-                    description = table.Column<string>(type: "text", nullable: false),
-                    category = table.Column<string>(type: "varchar", maxLength: 100, nullable: true),
-                    price = table.Column<string>(type: "text", nullable: true),
-                    image_url = table.Column<string>(type: "text", nullable: true),
-                    features = table.Column<string[]>(type: "text[]", nullable: true)
+                    catalog_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    stand_id = table.Column<string>(type: "varchar", maxLength: 64, nullable: false),
+                    name = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_catalog_item", x => x.item_id);
+                    table.PrimaryKey("pk_catalogs", x => x.catalog_id);
                     table.ForeignKey(
-                        name: "fk_catalog_item_stand",
+                        name: "fk_catalog_stand",
                         column: x => x.stand_id,
                         principalTable: "stand",
                         principalColumn: "qr_code",
@@ -134,7 +134,7 @@ namespace ExpoConnect.Infrastructure.Migrations
                     stand_id = table.Column<string>(type: "varchar", maxLength: 128, nullable: false),
                     notes = table.Column<string>(type: "text", nullable: true),
                     rating = table.Column<int>(type: "int4", nullable: true),
-                    stickers = table.Column<string[]>(type: "text[]", nullable: false),
+                    stickers = table.Column<int[]>(type: "visit_sticker[]", nullable: true),
                     is_favorite = table.Column<bool>(type: "bool", nullable: false, defaultValue: false),
                     follow_up = table.Column<bool>(type: "bool", nullable: false, defaultValue: false),
                     created_at = table.Column<DateTime>(type: "timestamptz", nullable: false, defaultValueSql: "now()")
@@ -156,76 +156,105 @@ namespace ExpoConnect.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "catalog_item",
+                columns: table => new
+                {
+                    item_id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuid_generate_v4()"),
+                    catalog_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "varchar", maxLength: 200, nullable: false),
+                    description = table.Column<string>(type: "text", nullable: true),
+                    category = table.Column<string>(type: "varchar", maxLength: 100, nullable: false),
+                    price = table.Column<decimal>(type: "numeric(12,2)", nullable: false),
+                    image_url = table.Column<string>(type: "text", nullable: true),
+                    features = table.Column<string[]>(type: "text[]", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_catalog_item", x => x.item_id);
+                    table.ForeignKey(
+                        name: "fk_catalog_item_catalog",
+                        column: x => x.catalog_id,
+                        principalTable: "catalogs",
+                        principalColumn: "catalog_id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_auth_refresh_token_token",
+                name: "ix_auth_refresh_token_token",
                 table: "auth_refresh_token",
                 column: "token",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_auth_refresh_token_user_id",
+                name: "ix_auth_refresh_token_user_id",
                 table: "auth_refresh_token",
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_catalog_item_category",
+                name: "ix_catalog_item_catalog_id",
+                table: "catalog_item",
+                column: "catalog_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_catalog_item_catalog_id_name",
+                table: "catalog_item",
+                columns: new[] { "catalog_id", "name" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_catalog_item_category",
                 table: "catalog_item",
                 column: "category");
 
             migrationBuilder.CreateIndex(
-                name: "IX_catalog_item_stand_id",
-                table: "catalog_item",
+                name: "ix_catalogs_stand_id",
+                table: "catalogs",
                 column: "stand_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_catalog_item_stand_id_name",
-                table: "catalog_item",
-                columns: new[] { "stand_id", "name" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_stand_exhibitor_id",
+                name: "ix_stand_exhibitor_id",
                 table: "stand",
                 column: "exhibitor_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_stand_stand_number",
+                name: "ix_stand_stand_number",
                 table: "stand",
                 column: "stand_number");
 
             migrationBuilder.CreateIndex(
-                name: "IX_users_email",
+                name: "ix_users_email",
                 table: "users",
                 column: "email",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_users_is_active",
+                name: "ix_users_is_active",
                 table: "users",
                 column: "is_active");
 
             migrationBuilder.CreateIndex(
-                name: "IX_users_role",
+                name: "ix_users_role",
                 table: "users",
                 column: "role");
 
             migrationBuilder.CreateIndex(
-                name: "IX_visit_rating",
+                name: "ix_visit_rating",
                 table: "visit",
                 column: "rating");
 
             migrationBuilder.CreateIndex(
-                name: "IX_visit_stand_id",
+                name: "ix_visit_stand_id",
                 table: "visit",
                 column: "stand_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_visit_visitor_id",
+                name: "ix_visit_visitor_id",
                 table: "visit",
                 column: "visitor_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_visit_visitor_id_stand_id",
+                name: "ix_visit_visitor_id_stand_id",
                 table: "visit",
                 columns: new[] { "visitor_id", "stand_id" },
                 unique: true);
@@ -245,6 +274,9 @@ namespace ExpoConnect.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "visit");
+
+            migrationBuilder.DropTable(
+                name: "catalogs");
 
             migrationBuilder.DropTable(
                 name: "stand");

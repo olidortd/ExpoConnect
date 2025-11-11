@@ -1,7 +1,4 @@
-﻿// Domain/Expo/Stand.cs
-using ExpoConnect.Domain;
-
-namespace ExpoConnect.Domain.Expo;
+﻿namespace ExpoConnect.Domain.Expo;
 
 public class Stand
 {
@@ -10,7 +7,7 @@ public class Stand
     public string StandNumber { get; set; } = default!;
     public string CompanyName { get; set; } = default!;
     public string? Description { get; set; }
-    public StandIndustry Industry { get; set; }
+    public string? Industry { get; set; }
     public string? ContactEmail { get; set; }
     public string? ContactPhone { get; set; }
     public string? Website { get; set; }
@@ -21,5 +18,5 @@ public class Stand
 
     // nav
     public Users.User Exhibitor { get; set; } = default!;
-    public List<CatalogItem> Catalog { get; set; } = new();
+    public List<Catalog> Catalog { get; set; } = new();
 }

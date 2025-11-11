@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="15.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ExpoConnect.Domain\ExpoConnect.Domain.csproj" />
     <ProjectReference Include="..\ExpoConnect.Contracts\ExpoConnect.Contracts.csproj" />
   </ItemGroup>

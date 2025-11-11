@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ExpoConnect.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251103112244_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251109164048_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,6 +23,7 @@ namespace ExpoConnect.Infrastructure.Migrations
                 .HasAnnotation("ProductVersion", "8.0.21")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresEnum(modelBuilder, "visit_sticker", new[] { "innovative", "professional", "friendly", "informative", "high_quality", "good_value", "impressive", "would_recommend" });
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("ExpoConnect.Domain.Auth.RefreshToken", b =>
@@ -62,9 +63,11 @@ namespace ExpoConnect.Infrastructure.Migrations
                         .HasName("pk_auth_refresh_token");
 
                     b.HasIndex("Token")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_auth_refresh_token_token");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_auth_refresh_token_user_id");
 
                     b.ToTable("auth_refresh_token", (string)null);
                 });
@@ -86,6 +89,46 @@ namespace ExpoConnect.Infrastructure.Migrations
                     b.ToTable("user_credentials", (string)null);
                 });
 
+            modelBuilder.Entity("ExpoConnect.Domain.Expo.Catalog", b =>
+                {
+                    b.Property<Guid>("CatalogId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("catalog_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("StandId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar")
+                        .HasColumnName("stand_id");
+
+                    b.HasKey("CatalogId")
+                        .HasName("pk_catalogs");
+
+                    b.HasIndex("StandId")
+                        .HasDatabaseName("ix_catalogs_stand_id");
+
+                    b.ToTable("catalogs", (string)null);
+                });
+
             modelBuilder.Entity("ExpoConnect.Domain.Expo.CatalogItem", b =>
                 {
                     b.Property<Guid>("ItemId")
@@ -94,13 +137,17 @@ namespace ExpoConnect.Infrastructure.Migrations
                         .HasColumnName("item_id")
                         .HasDefaultValueSql("uuid_generate_v4()");
 
+                    b.Property<Guid>("CatalogId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("catalog_id");
+
                     b.Property<string>("Category")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar")
                         .HasColumnName("category");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("description");
 
@@ -118,25 +165,22 @@ namespace ExpoConnect.Infrastructure.Migrations
                         .HasColumnType("varchar")
                         .HasColumnName("name");
 
-                    b.Property<string>("Price")
-                        .HasColumnType("text")
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric(12,2)")
                         .HasColumnName("price");
-
-                    b.Property<string>("StandId")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar")
-                        .HasColumnName("stand_id");
 
                     b.HasKey("ItemId")
                         .HasName("pk_catalog_item");
 
-                    b.HasIndex("Category");
+                    b.HasIndex("CatalogId")
+                        .HasDatabaseName("ix_catalog_item_catalog_id");
 
-                    b.HasIndex("StandId");
+                    b.HasIndex("Category")
+                        .HasDatabaseName("ix_catalog_item_category");
 
-                    b.HasIndex("StandId", "Name")
-                        .IsUnique();
+                    b.HasIndex("CatalogId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("ix_catalog_item_catalog_id_name");
 
                     b.ToTable("catalog_item", (string)null);
                 });
@@ -203,9 +247,11 @@ namespace ExpoConnect.Infrastructure.Migrations
                     b.HasKey("QrCode")
                         .HasName("pk_stand");
 
-                    b.HasIndex("ExhibitorId");
+                    b.HasIndex("ExhibitorId")
+                        .HasDatabaseName("ix_stand_exhibitor_id");
 
-                    b.HasIndex("StandNumber");
+                    b.HasIndex("StandNumber")
+                        .HasDatabaseName("ix_stand_stand_number");
 
                     b.ToTable("stand", (string)null);
                 });
@@ -250,9 +296,8 @@ namespace ExpoConnect.Infrastructure.Migrations
                         .HasColumnType("varchar")
                         .HasColumnName("stand_id");
 
-                    b.Property<string[]>("Stickers")
-                        .IsRequired()
-                        .HasColumnType("text[]")
+                    b.Property<int[]>("Stickers")
+                        .HasColumnType("visit_sticker[]")
                         .HasColumnName("stickers");
 
                     b.Property<string>("VisitorId")
@@ -263,14 +308,18 @@ namespace ExpoConnect.Infrastructure.Migrations
                     b.HasKey("VisitId")
                         .HasName("pk_visit");
 
-                    b.HasIndex("Rating");
+                    b.HasIndex("Rating")
+                        .HasDatabaseName("ix_visit_rating");
 
-                    b.HasIndex("StandId");
+                    b.HasIndex("StandId")
+                        .HasDatabaseName("ix_visit_stand_id");
 
-                    b.HasIndex("VisitorId");
+                    b.HasIndex("VisitorId")
+                        .HasDatabaseName("ix_visit_visitor_id");
 
                     b.HasIndex("VisitorId", "StandId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_visit_visitor_id_stand_id");
 
                     b.ToTable("visit", (string)null);
                 });
@@ -336,11 +385,14 @@ namespace ExpoConnect.Infrastructure.Migrations
                         .HasName("pk_users");
 
                     b.HasIndex("Email")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_email");
 
-                    b.HasIndex("IsActive");
+                    b.HasIndex("IsActive")
+                        .HasDatabaseName("ix_users_is_active");
 
-                    b.HasIndex("Role");
+                    b.HasIndex("Role")
+                        .HasDatabaseName("ix_users_role");
 
                     b.ToTable("users", (string)null);
                 });
@@ -351,7 +403,8 @@ namespace ExpoConnect.Infrastructure.Migrations
                         .WithMany("RefreshTokens")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_auth_refresh_token_users_user_id");
 
                     b.Navigation("User");
                 });
@@ -362,19 +415,32 @@ namespace ExpoConnect.Infrastructure.Migrations
                         .WithOne("Credential")
                         .HasForeignKey("ExpoConnect.Domain.Auth.UserCredential", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_user_credentials_users_user_id");
                 });
 
-            modelBuilder.Entity("ExpoConnect.Domain.Expo.CatalogItem", b =>
+            modelBuilder.Entity("ExpoConnect.Domain.Expo.Catalog", b =>
                 {
                     b.HasOne("ExpoConnect.Domain.Expo.Stand", "Stand")
                         .WithMany("Catalog")
                         .HasForeignKey("StandId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_catalog_item_stand");
+                        .HasConstraintName("fk_catalog_stand");
 
                     b.Navigation("Stand");
+                });
+
+            modelBuilder.Entity("ExpoConnect.Domain.Expo.CatalogItem", b =>
+                {
+                    b.HasOne("ExpoConnect.Domain.Expo.Catalog", "Catalog")
+                        .WithMany("Items")
+                        .HasForeignKey("CatalogId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_catalog_item_catalog");
+
+                    b.Navigation("Catalog");
                 });
 
             modelBuilder.Entity("ExpoConnect.Domain.Expo.Stand", b =>
@@ -408,6 +474,11 @@ namespace ExpoConnect.Infrastructure.Migrations
                     b.Navigation("Stand");
 
                     b.Navigation("Visitor");
+                });
+
+            modelBuilder.Entity("ExpoConnect.Domain.Expo.Catalog", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("ExpoConnect.Domain.Expo.Stand", b =>

@@ -22,6 +22,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpoConnect.Api", "ExpoConn
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExpoConnect.Contracts", "ExpoConnect.Contracts\ExpoConnect.Contracts.csproj", "{9D467FCD-1074-47B6-943F-65FAC4806F35}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6D774C4E-2A72-4A84-B908-5574864E6740} = {6D774C4E-2A72-4A84-B908-5574864E6740}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
