@@ -14,7 +14,10 @@ using ExpoConnect.Infrastructure.Services;
 
 
 var builder = WebApplication.CreateBuilder(args);
-
+var pwd = builder.Configuration["POSTGRES_PASSWORD"];
+var db = builder.Configuration["POSTGRES_DB"];
+var connectionString = $"Host=localhost;Port=5432;Database={db};Username=postgres;Password={pwd}";
+builder.Configuration["ConnectionStrings:Default"] = connectionString;
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseNpgsql(builder.Configuration.GetConnectionString("Default"),
             npg => npg.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
