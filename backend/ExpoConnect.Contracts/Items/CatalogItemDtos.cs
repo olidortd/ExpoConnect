@@ -3,14 +3,14 @@
 namespace ExpoConnect.Contracts.Items;
 
 public record CatalogItemResponse(
-    string ItemId,
-    string StandId,
+    Guid ItemId,
+    Guid StandId,
     string Name,
     string? Description,
     string Category,
     decimal Price,
     string? ImageUrl,
-    string? Features
+    string[]? Features
 );
 
 public class CreateCatalogItemRequest
@@ -32,8 +32,7 @@ public class CreateCatalogItemRequest
     [Url]
     public string? ImageUrl { get; init; }
 
-    [StringLength(2000)]
-    public string? Features { get; init; }
+    public string[]? Features { get; init; }
 }
 
 public class UpdateCatalogItemRequest
@@ -56,5 +55,5 @@ public class UpdateCatalogItemRequest
     public string? ImageUrl { get; init; }
 
     [StringLength(2000)]
-    public string? Features { get; init; }
+    public string[]? Features { get; init; }
 }

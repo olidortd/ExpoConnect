@@ -28,7 +28,18 @@ public class CatalogController(ICatalogService svc) : ControllerBase
     public async Task<ActionResult<CatalogResponse>> Create([FromBody] CreateCatalogRequest req, CancellationToken ct)
         => Ok(await _svc.CreateAsync(req, ct));
 
-    [HttpPost("items")]
-    public async Task<ActionResult<CatalogItemResponse>> AddItem([FromBody] CreateCatalogItemRequest req, CancellationToken ct)
-        => Ok(await _svc.AddItemAsync(req, ct));
+    [HttpPost("{catalogId:guid}/items")]
+    public async Task<ActionResult<CatalogItemResponse>> AddItem(
+    Guid catalogId,
+    [FromBody] CreateCatalogItemRequest req,
+    CancellationToken ct)
+    {
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
+        var created = await _svc.AddItemAsync(catalogId, req, ct);
+
+        return Ok(created);
+    }
+
 }

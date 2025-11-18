@@ -50,18 +50,58 @@ public class CatalogService : ICatalogService
 
         return MapToResponse(catalog);
     }
+    public async Task<CatalogItem?> UpdateItemAsync(Guid itemId, UpdateCatalogItemRequest request, CancellationToken ct)
+    {
+        var item = await _db.CatalogItems
+            .FirstOrDefaultAsync(i => i.ItemId == itemId, ct);
 
-    public async Task<CatalogItemResponse> AddItemAsync(CreateCatalogItemRequest req, CancellationToken ct)
+        if (item is null)
+            return null;
+
+        item.Name = request.Name.Trim();
+        item.Description = string.IsNullOrWhiteSpace(request.Description)
+            ? null
+            : request.Description.Trim();
+        item.Category = request.Category.Trim();
+        item.Price = request.Price;
+        item.ImageUrl = string.IsNullOrWhiteSpace(request.ImageUrl)
+            ? null
+            : request.ImageUrl.Trim();
+        item.Features = request.Features?
+            .Where(f => !string.IsNullOrWhiteSpace(f))
+            .Select(f => f.Trim())
+            .ToArray();
+
+
+        await _db.SaveChangesAsync(ct);
+
+        return item;
+    }
+
+    public async Task<bool> DeleteItemAsync(Guid itemId, CancellationToken ct)
+    {
+        var item = await _db.CatalogItems
+            .FirstOrDefaultAsync(i => i.ItemId == itemId, ct);
+
+        if (item is null)
+            return false;
+
+        _db.CatalogItems.Remove(item);
+        await _db.SaveChangesAsync(ct);
+        return true;
+    }
+    public async Task<CatalogItemResponse> AddItemAsync(Guid catalogId, CreateCatalogItemRequest req, CancellationToken ct)
     {
         var exists = await _db.Set<Catalog>()
-            .AnyAsync(c => c.CatalogId == req.CatalogId, ct);
+            .AnyAsync(c => c.CatalogId == catalogId, ct);
+
         if (!exists)
-            throw new KeyNotFoundException($"Catalog {req.CatalogId} not found");
+            throw new InvalidOperationException($"Catalog {catalogId} not found");
 
         var item = new CatalogItem
         {
             ItemId = Guid.NewGuid(),
-            CatalogId = req.CatalogId,
+            CatalogId = catalogId,
             Name = req.Name,
             Description = req.Description,
             Category = req.Category,
@@ -75,7 +115,7 @@ public class CatalogService : ICatalogService
 
         return new CatalogItemResponse(
             item.ItemId, item.CatalogId, item.Name, item.Description,
-            ConvertCategory(item.Category), item.Price, item.ImageUrl, item.Features);
+            item.Category, item.Price, item.ImageUrl, item.Features);
     }
 
     private static CatalogResponse MapToResponse(Catalog c) =>
