@@ -62,16 +62,19 @@ public partial class ApiClientService : ContentPage
         var json = JsonSerializer.Serialize(new { refreshToken });
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+        //בקשה לשרת כדי לחדש את הטוקן
         var refreshResponse = await _client.PostAsync("Auth/refresh",content);
         if (!refreshResponse.IsSuccessStatusCode)
             return false;
         
         var responseBody = await refreshResponse.Content.ReadAsStringAsync();
         var tokens = JsonSerializer.Deserialize<AuthResponse>(responseBody);
-
+        //בדיקה שהשרת  שלח טוקן חדש
         if (tokens == null || string.IsNullOrEmpty(tokens.AccessToken))
             return false;
-
+       
+        //מחליפים את ה־Access Token
+       // מחליפים גם את ה־Refresh Token
         await SecureStorage.SetAsync("access_token",tokens.AccessToken);
         await SecureStorage.SetAsync("refresh_token", tokens.RefreshToken);
 
@@ -87,6 +90,11 @@ public partial class ApiClientService : ContentPage
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         //יוצרים אובייקט בקשה אמיתי לשרת
         var request = new HttpRequestMessage(HttpMethod.Post, endpoint) {Content = content };
+        return await SendAsync(request);
+    }
+    public async Task<HttpResponseMessage> GetAsync(string endpoint)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
         return await SendAsync(request);
     }
 

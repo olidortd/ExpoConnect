@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="QR.AddNewItemPage"
+             Title="AddNewItemPage">
+    <VerticalStackLayout Padding="20" Spacing="15">
+
+        <Entry x:Name="CatalogIdEntry"
+                   Placeholder="Catalog ID (UUID)" />
+        
+        <Entry x:Name="NameEntry"
+                   Placeholder="Item Name" />
+
+        <Editor x:Name="DescriptionEntry"
+                    Placeholder="Description"
+                    AutoSize="TextChanges" />
+
+        <Entry x:Name="CategoryEntry"
+                   Placeholder="Category" />
+
+        <Entry x:Name="PriceEntry"
+                   Placeholder="Price"
+                   Keyboard="Numeric" />
+
+        <Entry x:Name="ImageUrlEntry"
+                   Placeholder="Image URL" />
+
+        <Entry x:Name="FeaturesEntry"
+                   Placeholder="Features (comma separated: big,nice)" />
+
+        <Button Text="Add Item"
+                    BackgroundColor="#6C63FF"
+                    TextColor="White"
+                    CornerRadius="10"
+                    Clicked="OnAddItemClicked"/>
+    </VerticalStackLayout>
+</ContentPage>
