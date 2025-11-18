@@ -47,6 +47,8 @@ public partial class LoginPage : ContentPage
                 await SecureStorage.SetAsync("refresh_token", refreshToken);
 
                 await DisplayAlert("Welcome", "Login successful!", "OK");
+                await Navigation.PushAsync(new LoginOptionsPage());
+
             }
             else
             {
