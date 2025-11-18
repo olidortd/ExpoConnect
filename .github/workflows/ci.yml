@@ -19,8 +19,9 @@ jobs:
 
       # Restore dependencies
       - name: Restore dependencies
-        run: dotnet restore ./backend/ExpoConnect.sln
+        run: dotnet restore ./ExpoConnect.sln
+        
 
       # Build
       - name: Build
-        run: dotnet build --no-restore ./backend/ExpoConnect.sln
+        run: dotnet build --no-restore ./ExpoConnect.sln 
