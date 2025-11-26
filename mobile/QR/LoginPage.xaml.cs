@@ -28,7 +28,7 @@ public partial class LoginPage : ContentPage
 
         try
         {
-            var api = new ApiClientService();
+            var api = ApiClientService.Instance;
 
             var data = new { email = email, password = password };
             var response = await api.PostAsync("Auth/login", data);
@@ -36,13 +36,13 @@ public partial class LoginPage : ContentPage
             if (response.IsSuccessStatusCode)
             {
                 string responseBody = await response.Content.ReadAsStringAsync();
-                //מפרקת (מפענחת) את הטקסט ששרת ה־API החזיר לתוך מבנה נתונים שניתן לגשת אליו בקוד
+                //Decodes (decodes) the text returned by the API server into a data structure that can be accessed in code.
                 var jsonResponse = JsonSerializer.Deserialize<JsonElement>(responseBody);
 
                 string accessToken = jsonResponse.GetProperty("accessToken").GetString();
                 string refreshToken = jsonResponse.GetProperty("refreshToken").GetString();
 
-                // שמירה מאובטחת
+            
                 await SecureStorage.SetAsync("access_token", accessToken);
                 await SecureStorage.SetAsync("refresh_token", refreshToken);
 

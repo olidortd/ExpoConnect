@@ -1,14 +1,24 @@
-<?xml version="1.0" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <Shell
     x:Class="QR.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:QR"
-    Title="QR">
+    xmlns:views="clr-namespace:QR">
 
-    <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <!-- תפריט ראשי למשתמש מחובר -->
 
+    <FlyoutItem Title="Catalogs" Route="LoginOptionsPage">
+        <ShellContent ContentTemplate="{DataTemplate views:LoginOptionsPage}" />
+    </FlyoutItem>
+
+    <FlyoutItem Title="Add New Item" Route="AddNewItem">
+        <ShellContent ContentTemplate="{DataTemplate views:AddNewItemPage}" />
+    </FlyoutItem>
+
+    <!-- כפתור יציאה -->
+
+    <MenuItem 
+        Text="Logout"
+        Clicked="OnLogoutClicked"
+        IconImageSource="logout.png" />
 </Shell>

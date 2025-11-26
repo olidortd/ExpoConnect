@@ -6,13 +6,12 @@ public partial class AddNewItemPage : ContentPage
 {
 	public AddNewItemPage()
 	{
-        var api = new ApiClientService();
         InitializeComponent();
 	}
 
     private async void OnAddItemClicked(object sender, EventArgs e)
     {
-        var api = new ApiClientService();
+        var api = ApiClientService.Instance;
 
         string catalogId = CatalogIdEntry.Text;
         string name = NameEntry.Text;
@@ -59,8 +58,8 @@ public partial class AddNewItemPage : ContentPage
             return;
         }
 
-        //  לרשימת Strings הופכת טקסט עם פסיקים
-        var features = featuresStr?
+            //  Converts text with commas to a list of Strings
+            var features = featuresStr?
              .Split(',')
              .Select(f => f.Trim())
              .Where(f => !string.IsNullOrWhiteSpace(f))
@@ -82,8 +81,7 @@ public partial class AddNewItemPage : ContentPage
             if (response.IsSuccessStatusCode)
             {
                 await DisplayAlert("Success", "Item added successfully!", "OK");
-                await Navigation.PopAsync(); // לחזור למסך הקודם
-            }
+                await Navigation.PopAsync(); 
             else
             {
                 string err = await response.Content.ReadAsStringAsync();

@@ -8,28 +8,28 @@ public partial class GetCatalogs : ContentPage
     
     public GetCatalogs()
     {
-        var api = new ApiClientService();
+
         InitializeComponent();
 
     }
 
     private async void OnGetNameClicked(object sender, EventArgs e)
     {
-        var api = new ApiClientService();
+        var api = ApiClientService.Instance;
         try
         {
             var response = await api.GetAsync("catalogs");
             if (response.IsSuccessStatusCode)
             {
                 string json = await response.Content.ReadAsStringAsync();
-              
-                // נפרש את התגובה כרשימה של אובייקטים
+
+                //  interpret the response as a list of objects
                 var jsonArray = JsonSerializer.Deserialize<List<JsonElement>>(json);
 
-                // ניקח את האובייקט הראשון ברשימה
+                //  take the first object in the list
                 var firstObject = jsonArray.FirstOrDefault();
 
-                // נשלוף את השם (או כל שדה אחר)
+                //  extract the name (or any other field)
                 string name = firstObject.GetProperty("name").GetString();
 
                 await DisplayAlert("User Name", name, "OK");

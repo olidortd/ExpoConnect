@@ -26,7 +26,7 @@ public partial class RegisterPage : ContentPage
 		
 		try {
             //
-            var api = new ApiClientService();
+            var api = ApiClientService.Instance;
 
             var data = new { email = email, password = password, displayName = displayName };
             var response = await api.PostAsync("Auth/register", data);
@@ -34,7 +34,7 @@ public partial class RegisterPage : ContentPage
 
             if (response.IsSuccessStatusCode)
             {
-                //אם ההרשמה הצליחה ננסה לקראואת הקוד שחזר
+                //If the registration was successful, we will try to read the returned code.
                 string responseBody = await response.Content.ReadAsStringAsync();
                 var jsonResponse = JsonSerializer.Deserialize<JsonElement>(responseBody);
                 string accessToken = jsonResponse.GetProperty("accessToken").GetString();
@@ -58,7 +58,7 @@ public partial class RegisterPage : ContentPage
         }
 		
        
-        //מחזיר לעמוד הקודם
+  
         await Navigation.PopAsync();
 
 
