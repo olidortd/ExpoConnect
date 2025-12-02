@@ -81,7 +81,8 @@ public partial class AddNewItemPage : ContentPage
             if (response.IsSuccessStatusCode)
             {
                 await DisplayAlert("Success", "Item added successfully!", "OK");
-                await Navigation.PopAsync(); 
+                await Navigation.PopAsync();
+            }
             else
             {
                 string err = await response.Content.ReadAsStringAsync();

@@ -13,11 +13,11 @@ $appOffline = Join-Path $publishPath "app_offline.htm"
 Write-Host "Solution dir: $solutionDir"
 Write-Host "Publish dir:  $publishPath"
 
-# 0) לקחת את האתר "אופליין" כדי לשחרר את ה-DLL
+# 0) ���� �� ���� "�������" ��� ����� �� �-DLL
 Write-Host "Putting app_offline.htm (taking site offline)..."
 "Site is temporarily offline for deployment." | Out-File -Encoding utf8 $appOffline
 
-# 1) Build + Publish — בדיוק כמו ידנית
+# 1) Build + Publish � ����� ��� �����
 Write-Host "Building and Publishing project..."
 Push-Location $solutionDir
 
@@ -31,19 +31,19 @@ Write-Host "dotnet publish exit code: $exitCode"
 
 if ($exitCode -ne 0) {
     Write-Host " Publish failed." -ForegroundColor Red
-    # במקרה קיצון לא מוחקים app_offline כדי לא להעלות גרסה שבורה
+    # ����� ����� �� ������ app_offline ��� �� ������ ���� �����
     exit
 }
 
 Write-Host " Publish completed successfully." -ForegroundColor Green
 
-# 2) להחזיר את האתר "און־ליין"
+# 2) ������ �� ���� "��������"
 if (Test-Path $appOffline) {
     Write-Host "Removing app_offline.htm (bringing site back online)..."
     Remove-Item $appOffline -Force
 }
 
-# 3) מידע על ה-DLL שפורסם
+# 3) ���� �� �-DLL ������
 $dll = Join-Path $publishPath "ExpoConnect.Api.dll"
 if (Test-Path $dll) {
     $info = Get-Item $dll

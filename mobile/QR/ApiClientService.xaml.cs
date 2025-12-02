@@ -36,6 +36,8 @@ public partial class ApiClientService : ContentPage
         }
     }
 
+   
+
     public async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request)
     {
         await AddAuthorizationHeaderAsync();
@@ -95,6 +97,22 @@ public partial class ApiClientService : ContentPage
     {
         var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
         return await SendAsync(request);
+    }
+
+
+    public async Task<T> GetAsync<T>(string endpoint)
+    {
+        await AddAuthorizationHeaderAsync();
+
+        var response = await _client.GetAsync(endpoint);
+        response.EnsureSuccessStatusCode();  // יזרוק שגיאה אם הקוד לא 200
+
+        var json = await response.Content.ReadAsStringAsync();
+
+        return JsonSerializer.Deserialize<T>(json, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        })!;
     }
 
     public class AuthResponse

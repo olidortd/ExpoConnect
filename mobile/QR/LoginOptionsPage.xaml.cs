@@ -16,4 +16,9 @@ public partial class LoginOptionsPage : ContentPage
     {
         await Navigation.PushAsync(new AddNewItemPage());
     }
+
+    private async void OnUsersCatalodsClicked(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new UsersCatalogsPage());
+    }
 }

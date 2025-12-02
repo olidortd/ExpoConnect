@@ -44,10 +44,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="UsersCatalogsPage.xaml.cs">
+	    <DependentUpon>UsersCatalogsPage.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
 		<MauiXaml Update="AddNewItemPage.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 		<MauiXaml Update="ApiClientService.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="CatalogItemsPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="UsersCatalogsPage.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 		<MauiXaml Update="GetCatalogs.xaml">

@@ -15,5 +15,11 @@
        TextColor="White"
        CornerRadius="10"
         Clicked="OnAddNewItemClicked"/>
+
+        <Button Text="View Catalops"
+      BackgroundColor="#6A1B9A"
+        TextColor="White"
+        CornerRadius="10"
+          Clicked="OnUsersCatalodsClicked"/>
     </VerticalStackLayout>
 </ContentPage>
