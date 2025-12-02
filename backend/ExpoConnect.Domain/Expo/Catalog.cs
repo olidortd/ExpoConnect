@@ -11,4 +11,20 @@ public class Catalog
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public ICollection<CatalogItem> Items { get; set; } = new List<CatalogItem>();
+
+    public Catalog(Guid catalogId, string name, string description, string standId)
+    {
+        CatalogId = catalogId;
+        Name = string.IsNullOrWhiteSpace(name)
+            ? throw new ArgumentException("Name is required", nameof(name))
+            : name.Trim();
+
+        Description = string.IsNullOrWhiteSpace(description)
+            ? throw new ArgumentException("Description is required", nameof(description))
+            : description.Trim();
+
+        StandId = standId;
+    }
+    protected Catalog() { }
+
 }

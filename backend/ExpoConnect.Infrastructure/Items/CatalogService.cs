@@ -36,12 +36,8 @@ public class CatalogService : ICatalogService
         if (!standExists)
             throw new KeyNotFoundException($"Stand '{req.StandId}' not found");
 
-        var catalog = new Catalog
+        var catalog = new Catalog(Guid.NewGuid(), req.StandId, req.Name, req.Description)
         {
-            CatalogId = Guid.NewGuid(),
-            StandId = req.StandId,
-            Name = req.Name,
-            Description = req.Description,
             CreatedAt = DateTime.UtcNow
         };
 

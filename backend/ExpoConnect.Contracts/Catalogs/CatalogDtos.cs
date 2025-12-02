@@ -1,4 +1,6 @@
-﻿namespace ExpoConnect.Contracts.Catalogs;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ExpoConnect.Contracts.Catalogs;
 
 public record CatalogResponse(
     Guid CatalogId,
@@ -9,6 +11,9 @@ public record CatalogResponse(
     List<Items.CatalogItemResponse> Items);
 
 public record CreateCatalogRequest(
+    [Required]
     string StandId,
+    [Required]
     string Name,
+    [Required]
     string Description);
